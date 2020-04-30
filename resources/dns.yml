@@ -1,0 +1,15 @@
+
+hostedZoneName: ${file(resources/config.yml):hostedZoneName}
+aliasHostedZoneId: ${file(resources/config.yml):hostedZoneId}
+aliasDNSName: s3-website-${self:provider.region}.amazonaws.com
+domains:
+  prod: ${self:service}-api.${self:custom.dns.hostedZoneName}
+  staging: ${self:service}-api-stage.${self:custom.dns.hostedZoneName}
+  dev: ${self:service}-api-dev.${self:custom.dns.hostedZoneName}
+customDomain:
+  domainName: ${self:custom.dns.domains.${self:provider.stage}}
+  basePath: ''
+  stage: ${self:provider.stage}
+  certificateName: "*.${self:custom.dns.hostedZoneName}"
+  createRoute53Record: true
+  endpointType: 'regional'

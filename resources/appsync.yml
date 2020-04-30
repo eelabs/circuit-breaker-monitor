@@ -1,0 +1,29 @@
+name: ${self:service}
+logConfig:
+  level: ALL
+authenticationType: API_KEY
+mappingTemplates:
+  - dataSource: DynamoMonitoringDDS
+    type: PercentageCircuitBreaker
+    field: events
+    request: 'mapEventsReq.vtl'
+    response: 'mapEventsRes.vtl'
+  - dataSource: liveCircuitBreakerStateLambdaDS
+    type: Query
+    field: circuitBreakers
+    request: 'circuitBreakersReq.vtl'
+    response: 'circuitBreakersRes.vtl'
+dataSources:
+  - type: AMAZON_DYNAMODB
+    name: DynamoMonitoringDDS
+    description: "A DataSource for monitoring circuit breakers in DynamoDB."
+    config:
+      tableName:
+        Ref: MonitoringTable
+      serviceRoleArn:  #{AppSyncDynamoDBServiceRole.Arn}
+  - type: AWS_LAMBDA
+    name: liveCircuitBreakerStateLambdaDS
+    description: "Query redis cache for live circuit breaker states"
+    config:
+      lambdaFunctionArn: "arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:service}-${self:provider.stage}-liveCircuitBreakerState"
+      serviceRoleArn: #{CircuitBreakerDataSourceIamRole.Arn}

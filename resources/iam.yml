@@ -1,0 +1,73 @@
+# Defines 3 roles
+#  - AppSync default role defines access to the 'MonitoringTable' in DynamoDB
+#  - Live circuit breaker state lambda role has permissions to run in the private VPC (connect to Elastic Network Interface)
+#  - AppSync data source role to permit appsync to call the live circuit breaker state lambda
+Resources:
+  AppSyncDynamoDBServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: AppSyncDynamoDBServiceRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "appsync.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Policies:
+        - PolicyName: "AppSyncDynamoDBServiceRole-Policy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:DescribeTable
+                  - dynamodb:Query
+                  - dynamodb:Scan
+                  - dynamodb:GetItem
+                  - dynamodb:PutItem
+                  - dynamodb:UpdateItem
+                  - dynamodb:DeleteItem
+                Resource:
+                  - { "Fn::GetAtt": [ "MonitoringTable", "Arn" ]}
+  CircuitBreakerDataSourceLambdaIamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: CircuitBreakerDataSourceLambdaRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      ManagedPolicyArns: [
+        "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+        "arn:aws:iam::aws:policy/service-role/AWSLambdaENIManagementAccess"
+      ]
+  CircuitBreakerDataSourceIamRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      RoleName: CircuitBreakerDataSourceRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "appsync.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Policies:
+        - PolicyName: "Lambda-circuitBreakerStoreServiceRole-Policy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "lambda:invokeFunction"
+                Resource: "arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:service}-${self:provider.stage}-liveCircuitBreakerState"

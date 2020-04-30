@@ -1,0 +1,72 @@
+type Query {
+    circuitBreakers: [CircuitBreaker!]!
+}
+
+interface CircuitBreaker {
+    service: String!
+    status: BreakerStatus!
+    type: String!
+    events(limit: Int = 100, nextToken: String): EventConnection
+}
+
+type PercentageCircuitBreaker implements CircuitBreaker {
+    service: String!
+    status: BreakerStatus!
+    type: String!
+    config: PercentageCircuitBreakerConfig!
+    values: PercentageCircuitBreakerValues!
+    events(limit: Int = 100, nextToken: String): EventConnection
+}
+
+type PercentageCircuitBreakerConfig {
+    ttl: Int!
+    percentFailed: Int!
+    reEnableAfterSeconds: Int!
+    minimumFailures: Int!
+}
+
+type PercentageCircuitBreakerValues {
+    successCount: Int!
+    failedCount: Int!
+    lastTripped: Int!
+}
+
+type EventConnection {
+    items: [Event]
+    nextToken: String
+}
+
+type Event {
+    event_type: EventType!
+    timestamp: Int!
+    request: Request
+    response: Response
+    elapsed_time: Int
+}
+
+type Request {
+    body: String
+    headers: [Header]
+}
+
+type Response {
+    body: String
+    headers: [Header]
+    status: Int
+}
+
+type Header {
+    key: String!
+    value: String!
+}
+
+enum BreakerStatus {
+    TRIPPED,
+    CLOSED
+}
+
+enum EventType {
+    FAILED,
+    TRIP,
+    RESET
+}

@@ -1,0 +1,11 @@
+Resources:
+  LiveCircuitBreakerStateLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: "/aws/lambda/circuit-breaker-serverless-monitor-dev-liveCircuitBreakerState"
+      RetentionInDays: 3
+  GraphQlApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: "/aws/appsync/${self:service}-${self:provider.stage}-appsync"
+      RetentionInDays: 3

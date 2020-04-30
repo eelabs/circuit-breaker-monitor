@@ -1,0 +1,19 @@
+Resources:
+  staticBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: ${self:custom.dns.customDomain.domainName}
+      AccessControl: PublicRead
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: index.html
+      CorsConfiguration:
+        CorsRules:
+          - AllowedOrigins:
+              - '*'
+            AllowedHeaders:
+              - '*'
+            AllowedMethods:
+              - GET
+              - HEAD
+            MaxAge: 3000

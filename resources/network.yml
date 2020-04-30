@@ -1,0 +1,44 @@
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: "10.0.0.0/16"
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+  PrivateSubnetA:
+    DependsOn: VPC
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: VPC
+      AvailabilityZone: ${self:provider.region}a
+      CidrBlock: "10.0.1.0/24"
+
+  PrivateLambdaSecurityGroup:
+    DependsOn: VPC
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: SecurityGroup for Management Functions
+      VpcId:
+        Ref: VPC
+
+  CacheStorageSecurityGroup:
+    DependsOn: VPC
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Ingress for Redis Cluster
+      VpcId:
+        Ref: VPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '6379'
+          ToPort: '6379'
+          SourceSecurityGroupId:
+            Ref: PrivateLambdaSecurityGroup
+
+  CacheSubnetGroup:
+    Type: AWS::ElastiCache::SubnetGroup
+    Properties:
+      Description: "ElastiCache Subnet Group"
+      SubnetIds:
+        - Ref: PrivateSubnetA
