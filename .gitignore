@@ -18,3 +18,4 @@ var/
 
 # Serverless directories
 .serverless
+web/src/config.js
