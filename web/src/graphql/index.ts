@@ -20,7 +20,7 @@ export const LOAD_BREAKERS = gql`
                 }
                 events(limit: 1000) {
                     items {
-                        eventType
+                        event_type
                         timestamp
                     }
                 }

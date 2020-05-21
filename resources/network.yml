@@ -42,3 +42,12 @@ Resources:
       Description: "ElastiCache Subnet Group"
       SubnetIds:
         - Ref: PrivateSubnetA
+
+
+Outputs:
+  PrivateLambdaSecurityGroup:
+    Value:
+      Fn::GetAtt: PrivateLambdaSecurityGroup.GroupId
+  PrivateLambdaSubnet:
+    Value:
+      Ref: PrivateSubnetA

@@ -18,26 +18,37 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
+interface CircuitBreakersData {
+    circuitBreakers: [PercentageCircuitBreaker]
+}
+
 export default function App() {
-    const { loading, data } = useQuery<PercentageCircuitBreaker[]>(LOAD_BREAKERS, { });
+    const { loading, data } = useQuery<CircuitBreakersData>(LOAD_BREAKERS, { });
     const classes = useStyles();
-    return (
-        <Container  className={clsx(classes.root)}>
-            <Grid container spacing={2} direction="row" alignItems="center" justify="center">
-                <Grid item xl={3}>
-                    <CircuitBreaker service="Customer details" success={46} failure={4} tripped={false}/>
+    if (data && data.circuitBreakers && data.circuitBreakers.length > 0) {
+        return (
+            <Container  className={clsx(classes.root)}>
+                <Grid container spacing={2} direction="row" alignItems="center" justify="center">
+                    { data.circuitBreakers.map( breaker => {
+                        return (
+                            <Grid item xl={3}>
+                                <CircuitBreaker service={breaker.service} success={breaker.values.successCount} failure={breaker.values.failedCount} tripped={breaker.status == "TRIPPED"}/>
+                            </Grid>
+                        )
+                    })}
                 </Grid>
-                <Grid item xl={3}>
-                    <CircuitBreaker service="Address lookup" success={92} failure={8} tripped={true}/>
+            </Container>
+        )
+    } else {
+        return (
+            <Container  className={clsx(classes.root)}>
+                <Grid container spacing={2} direction="row" alignItems="center" justify="center">
+                    <Grid item xl={3}>
+                        No breakers to display
+                    </Grid>
                 </Grid>
-                <Grid item xl={3}>
-                        <CircuitBreaker service="Payment details" success={92} failure={8} tripped={false}/>
-                </Grid>
-                <Grid item xl={3}>
-                        <CircuitBreaker service="Place order" success={92} failure={8} tripped={false}/>
-                </Grid>
-            </Grid>
-        </Container>
-    );
+            </Container>
+        )
+    }
 }
 

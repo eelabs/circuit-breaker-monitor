@@ -19,3 +19,7 @@ Resources:
       TimeToLiveSpecification:
         AttributeName: ttl
         Enabled: true
+
+Outputs:
+  MonitoringTable:
+    Value: "Monitoring-${self:provider.stage}"

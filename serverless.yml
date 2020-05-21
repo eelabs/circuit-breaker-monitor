@@ -84,3 +84,10 @@ resources:
             - "Fn::GetAtt": CacheStorageSecurityGroup.GroupId
           CacheSubnetGroupName:
             Ref: CacheSubnetGroup
+
+Outputs:
+  RedisHost:
+    Value:
+      Fn::GetAtt:
+        - ElastiCacheCluster
+        - RedisEndpoint.Address
