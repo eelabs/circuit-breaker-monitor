@@ -11,7 +11,7 @@
   "author": "Chris Tarttelin + Equal Experts",
   "license": "Apache-2.0",
   "dependencies": {
-    "serverless-appsync-plugin": "^1.3.0",
+    "serverless-appsync-plugin": "^1.3.1",
     "serverless-pseudo-parameters": "^2.5.0",
     "serverless-python-requirements": "^5.1.0",
     "serverless-s3-sync": "^1.12.0",
